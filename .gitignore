@@ -1,0 +1,10 @@
+# Ignore Everything
+/*
+/*/
+
+# Except these
+!/.gitignore
+!/LICENSE.md
+!/pom.xml
+!/README.md
+!/src/

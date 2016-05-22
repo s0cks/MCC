@@ -1,0 +1,5 @@
+; 10 + 10 = 20
+twenty:
+    mov rax,10
+    mov rbx,10
+    add rax,rbx
