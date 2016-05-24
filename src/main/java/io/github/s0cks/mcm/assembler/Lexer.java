@@ -18,6 +18,9 @@ implements Closeable {
 
   static{
     addSymbol('_');
+    addSymbol('+');
+    addSymbol(']');
+    addSymbol('[');
   }
 
   public static boolean isSymbol(char c){
@@ -69,7 +72,7 @@ implements Closeable {
       default: break;
     }
 
-    if(Character.isAlphabetic(next)){
+    if(Character.isAlphabetic(next) || isSymbol(next)){
       buffer += next;
       while(Character.isAlphabetic(next = this.peek()) || Character.isDigit(next) || isSymbol(next)){
         buffer += next;
@@ -84,8 +87,9 @@ implements Closeable {
       }
     } else if(Character.isDigit(next)){
       buffer += next;
-      while((Character.isDigit(next = this.next()))){
+      while((Character.isDigit(next = this.peek()))){
         buffer += next;
+        this.next();
       }
       return new Token(Token.Kind.INT, buffer);
     } else if(next == '\0'){

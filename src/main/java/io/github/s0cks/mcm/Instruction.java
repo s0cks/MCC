@@ -8,7 +8,11 @@ public enum Instruction{
   DIV, // e.x: div rax, 10
   MOV, // e.x: mov rax, 10
   CMP, // e.x: cmp rax, rbx
-  JMP; // e.x: jmp <label>
+  JMP, // e.x: jmp <label>
+  PUSH,
+  POP,
+  CALL,
+  RET;
 
   @Override
   public String toString() {

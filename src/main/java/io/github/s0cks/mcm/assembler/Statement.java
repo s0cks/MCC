@@ -1,8 +1,10 @@
 package io.github.s0cks.mcm.assembler;
 
+import io.github.s0cks.mcm.Address;
 import io.github.s0cks.mcm.Binary;
 import io.github.s0cks.mcm.Instruction;
 import io.github.s0cks.mcm.Operand;
+import io.github.s0cks.mcm.OperandAddress;
 import io.github.s0cks.mcm.OperandInteger;
 import io.github.s0cks.mcm.OperandRegister;
 
@@ -37,18 +39,27 @@ public final class Statement {
     short a = 0;
     short b = 0;
 
+    short extraBits[] = {
+      -1, -1
+    };
+
     switch (this.instruction) {
       default: {
-        a = this.encodeOperand(0, binary);
-        b = this.encodeOperand(1, binary);
+        a = this.encodeOperand(0, extraBits);
+        b = this.encodeOperand(1, extraBits);
       }
     }
 
     short op = (short) this.instruction.ordinal();
     binary.append(((short) (op | (a << 4) | (b << 10))));
+    for(short sh : extraBits){
+      if(sh != -1){
+        binary.append(sh);
+      }
+    }
   }
 
-  private short encodeOperand(int index, Binary binary) {
+  private short encodeOperand(int index, short[] extra) {
     Operand<?> o = this.operands[index];
     if (o != null) {
       switch (o.type()) {
@@ -59,10 +70,15 @@ public final class Statement {
         case LITERAL: {
           int value = ((OperandInteger) o).value();
           if(value < 0x20){
-            return (short) (value + 0x20);
+            return ((short) (value + 0x20));
           }
-          binary.append(((short) value));
+          extra[index] = ((short) value);
           return 0x1F;
+        }
+        case ADDRESS:{
+          Address addr = ((OperandAddress) o).value();
+          extra[index] = ((short) (addr.offset));
+          return (short) (0x10 | (addr.register.ordinal() & 7));
         }
       }
     }
