@@ -1,5 +1,4 @@
 ; 10 + 10 = 20
 twenty:
-    mov [RBP + 10], 10
-    add RBP, 10
-    mov [RSP + 10], 10
+    mov RAX, 10
+    syscall RAX
