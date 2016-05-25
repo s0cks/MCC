@@ -61,12 +61,12 @@ public final class Statement {
         b = this.encodeOperand(1, extraBits);
 
         binary.append(((short) (op | (a << 4) | (b << 10))));
-        for(short sh : extraBits){
-          if(sh != -1){
-            binary.append(sh);
-          }
-        }
-        break;
+      }
+    }
+
+    for(short sh : extraBits){
+      if(sh != -1){
+        binary.append(sh);
       }
     }
   }

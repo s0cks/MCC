@@ -11,7 +11,7 @@ public final class Disassembler {
 
   private static int disassembleOperand(PrintWriter writer, short value, Binary binary, int counter) {
     if (value < Register.values().length) {
-      writer.write(Register.values()[value & 7].toString());
+      writer.write(Register.values()[value & 0x7].toString());
       return 0;
     } else if (value < 0x10 + Register.values().length) {
       Register reg = Register.values()[value & 0x7];
@@ -28,7 +28,10 @@ public final class Disassembler {
       writer.write("0x" + hex);
       return 0;
     } else{
-      if(value == 0){
+      if(value == 0x1F){
+        writer.write("0x" + Integer.toString(binary.get(counter), 16).toUpperCase());
+        return 1;
+      } else if(value == 0){
         writer.write("0");
       }
     }
