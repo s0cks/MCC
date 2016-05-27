@@ -6,6 +6,7 @@ import io.github.s0cks.mmc.Instruction;
 import io.github.s0cks.mmc.Operand;
 import io.github.s0cks.mmc.OperandAddress;
 import io.github.s0cks.mmc.OperandInteger;
+import io.github.s0cks.mmc.OperandLabel;
 import io.github.s0cks.mmc.OperandRegister;
 
 public final class Statement {
@@ -91,6 +92,10 @@ public final class Statement {
           Address addr = ((OperandAddress) o).value();
           extra[index] = ((short) (addr.offset));
           return (short) (0x10 | (addr.register.ordinal() & 7));
+        }
+        case LABEL:{
+          extra[index] = ((OperandLabel) o).value().shortValue();
+          return 0x2F;
         }
       }
     }

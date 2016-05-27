@@ -4,7 +4,8 @@ public interface Operand<V>{
   enum Type{
     REGISTER,
     ADDRESS,
-    LITERAL;
+    LITERAL,
+    LABEL;
 
     @Override
     public String toString() {

@@ -1,24 +1,17 @@
 package io.github.s0cks.mmc;
 
 import io.github.s0cks.mmc.assembler.Parser;
-import io.github.s0cks.mmc.assembler.Statement;
 import io.github.s0cks.mmc.util.Disassembler;
 import org.junit.Test;
 
 import java.io.PrintWriter;
-import java.util.List;
 
 public class DisassemblerTest {
   
   @Test
   public void testDump()
   throws Exception {
-    List<Statement> statements = new Parser(System.class.getResourceAsStream("/Test.mcm")).parse();
-    Binary bin = new Binary();
-    for(Statement statement : statements){
-      statement.encode(bin);
-    }
-
+    Binary bin = (new Parser(System.class.getResourceAsStream("/Test.mmc"))).compile();
     Disassembler.dump(new PrintWriter(System.out), bin);
   }
 }

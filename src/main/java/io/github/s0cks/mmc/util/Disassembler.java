@@ -18,24 +18,20 @@ public final class Disassembler {
       int offset = ((int) binary.get(counter));
 
       writer.write(String.format(
-        "[%s + 0x%s]",
-        reg,
-        Integer.toString(offset, 16).toUpperCase()
+      "[%s + 0x%s]",
+      reg,
+      Integer.toString(offset, 16)
+             .toUpperCase()
       ));
-      return 1;
+    } else if(value == 0x2F){
+      writer.write(Integer.toString(binary.get(counter)));
     } else if (value >= 0x20) {
-      String hex = Integer.toString(value - 0x20, 16).toUpperCase();
-      writer.write("0x" + hex);
+      writer.write(Integer.toString(value - 0x20));
       return 0;
-    } else{
-      if(value == 0x1F){
-        writer.write("0x" + Integer.toString(binary.get(counter), 16).toUpperCase());
-        return 1;
-      } else if(value == 0){
-        writer.write("0");
-      }
+    } else if (value == 0x1F) {
+      writer.write(Integer.toString(binary.get(counter)));
     }
-    return 0;
+    return 1;
   }
 
   public static void dump(PrintWriter writer, Binary binary) {
@@ -44,43 +40,42 @@ public final class Disassembler {
       short op = InstructionDecoder.decodeInstruction(binary.get(counter));
       short a = InstructionDecoder.decodeOperandA(binary.get(counter));
       short b = InstructionDecoder.decodeOperandB(binary.get(counter));
-      counter++;
 
-      if (op >= 0) {
+      if (op > 0) {
         Instruction instr;
-        if(InstructionDecoder.isJmp(binary.get(counter - 1))){
+        if (InstructionDecoder.isJmp(binary.get(counter))) {
           instr = Instruction.JMP;
 
           writer.write(instr.toString());
           writer.write(" ");
-          counter += disassembleOperand(writer, b, binary, counter += 1) - 1;
+          counter += disassembleOperand(writer, b, binary, counter + 1);
           writer.write("\n");
-        } else if(InstructionDecoder.isSysCall(binary.get(counter - 1))){
+        } else if (InstructionDecoder.isSysCall(binary.get(counter))) {
           instr = Instruction.SYSCALL;
 
           writer.write(instr.toString());
           writer.write(" ");
-          counter += disassembleOperand(writer, b, binary, counter += 1);
+          counter += disassembleOperand(writer, b, binary, counter + 1);
           writer.write("\n");
-        } else{
+        } else {
           instr = Instruction.values()[op];
 
           writer.write(instr.toString());
-          if(instr == Instruction.RET){
+          if (instr == Instruction.RET) {
             writer.write("\n");
             continue;
           }
 
           writer.write(" ");
-          counter += disassembleOperand(writer, a, binary, counter);
+          counter += disassembleOperand(writer, a, binary, counter + 1);
 
-          if(instr == Instruction.POP || instr == Instruction.PUSH){
+          if (instr == Instruction.POP || instr == Instruction.PUSH) {
             writer.write("\n");
             continue;
           }
 
           writer.write(", ");
-          counter += disassembleOperand(writer, b, binary, counter);
+          counter += disassembleOperand(writer, b, binary, counter + 1);
           writer.write('\n');
         }
       } else {
@@ -88,6 +83,8 @@ public final class Disassembler {
         writer.write(Integer.toString(op, 16));
         writer.write(">\n");
       }
+
+      counter += 1;
     }
 
     writer.flush();
