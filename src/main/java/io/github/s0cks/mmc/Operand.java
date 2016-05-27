@@ -5,7 +5,8 @@ public interface Operand<V>{
     REGISTER,
     ADDRESS,
     LITERAL,
-    LABEL;
+    LABEL,
+    BYTES;
 
     @Override
     public String toString() {

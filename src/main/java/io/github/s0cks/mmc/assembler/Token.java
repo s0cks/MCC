@@ -10,7 +10,8 @@ public final class Token{
     COMMA,
     LABEL,
     PLUS,
-    EOF;
+    EOF,
+    BYTES;
   }
 
   public final Kind kind;

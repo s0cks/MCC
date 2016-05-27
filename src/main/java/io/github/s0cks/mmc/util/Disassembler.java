@@ -13,6 +13,15 @@ public final class Disassembler {
     if (value < Register.values().length) {
       writer.write(Register.values()[value & 0x7].toString());
       return 0;
+    } else if(value == 0x3F){
+      int len = binary.get(counter++);
+
+      String str = "";
+      for(int i = counter; i < counter + len - 1; i += 2){
+        str += ((char) (binary.get(i + 1) | (binary.get(i + 2) << 8)));
+      }
+      writer.write(str);
+      return len + 2;
     } else if (value < 0x10 + Register.values().length) {
       Register reg = Register.values()[value & 0x7];
       int offset = ((int) binary.get(counter));
@@ -63,14 +72,16 @@ public final class Disassembler {
           writer.write(instr.toString());
           if (instr == Instruction.RET) {
             writer.write("\n");
+            counter += 1;
             continue;
           }
 
           writer.write(" ");
           counter += disassembleOperand(writer, a, binary, counter + 1);
 
-          if (instr == Instruction.POP || instr == Instruction.PUSH) {
+          if (instr == Instruction.POP || instr == Instruction.PUSH || instr == Instruction.CALL || instr == Instruction.DB) {
             writer.write("\n");
+            counter += 1;
             continue;
           }
 

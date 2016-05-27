@@ -24,6 +24,10 @@ implements Iterable<Short>,
     this.code[this.pc] = op;
   }
 
+  public void setAt(int loc, short op){
+    this.code[loc] = op;
+  }
+
   public int size(){
     return this.size;
   }

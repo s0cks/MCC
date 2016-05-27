@@ -5,6 +5,7 @@ import io.github.s0cks.mmc.Binary;
 import io.github.s0cks.mmc.Instruction;
 import io.github.s0cks.mmc.Operand;
 import io.github.s0cks.mmc.OperandAddress;
+import io.github.s0cks.mmc.OperandBytes;
 import io.github.s0cks.mmc.OperandInteger;
 import io.github.s0cks.mmc.OperandLabel;
 import io.github.s0cks.mmc.OperandRegister;
@@ -13,6 +14,7 @@ public final class Statement {
   public final String label;
   public final Instruction instruction;
   public final Operand<?>[] operands;
+  private short[] bytes = null;
 
   public Statement(String label, Instruction instruction, Operand<?>... operands) {
     if (operands.length > 2) throw new IllegalStateException("Statements can only use no more than 2 operands");
@@ -70,6 +72,13 @@ public final class Statement {
         binary.append(sh);
       }
     }
+
+    if(this.bytes != null){
+      for(short sh : this.bytes){
+        binary.append(sh);
+      }
+      this.bytes = null;
+    }
   }
 
   private short encodeOperand(int index, short[] extra) {
@@ -96,6 +105,11 @@ public final class Statement {
         case LABEL:{
           extra[index] = ((OperandLabel) o).value().shortValue();
           return 0x2F;
+        }
+        case BYTES:{
+          this.bytes = ((OperandBytes) o).value();
+          extra[index] = ((short) this.bytes.length);
+          return 0x3F;
         }
       }
     }

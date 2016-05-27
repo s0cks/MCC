@@ -14,7 +14,8 @@ public enum Instruction{
   POP, // e.x: pop <value>
   CALL, // e.x: call <value>
   RET, // e.x: ret
-  SYSCALL; // e.x: syscall <value>
+  SYSCALL, // e.x: syscall <value>
+  DB; // e.x: db "Hello World"
 
   @Override
   public String toString() {

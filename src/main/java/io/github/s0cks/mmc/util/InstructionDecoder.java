@@ -22,4 +22,8 @@ public final class InstructionDecoder{
   public static boolean isSysCall(short code){
     return ((code & 0x03FF) == 0x1C2);
   }
+
+  public static boolean isCall(short code){
+    return ((code & 0x03FF) == 0x1C3);
+  }
 }

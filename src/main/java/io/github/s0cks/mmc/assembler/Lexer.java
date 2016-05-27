@@ -56,6 +56,7 @@ implements Closeable {
   private Token nextToken()
   throws IOException{
     char next = this.nextReal();
+
     String buffer = "";
     switch(next){
       case ';':{
@@ -69,10 +70,17 @@ implements Closeable {
       case ']': return new Token(Token.Kind.RBRACKET, "]");
       case '+': return new Token(Token.Kind.PLUS, "+");
       case ',': return new Token(Token.Kind.COMMA, ",");
+      case '\0': return new Token(Token.Kind.EOF, "");
       default: break;
     }
 
-    if(Character.isAlphabetic(next) || isSymbol(next)){
+    if(next == '"'){
+      while((next = this.next()) != '"'){
+        buffer += next;
+      }
+
+      return new Token(Token.Kind.BYTES, buffer);
+    } else if(Character.isAlphabetic(next) || isSymbol(next)){
       buffer += next;
       while(Character.isAlphabetic(next = this.peek()) || Character.isDigit(next) || isSymbol(next)){
         buffer += next;
@@ -92,9 +100,7 @@ implements Closeable {
         this.next();
       }
       return new Token(Token.Kind.INT, buffer);
-    } else if(next == '\0'){
-      return new Token(Token.Kind.EOF, "");
-    } else{
+    } else {
       throw new IllegalStateException("undefined: " + next);
     }
   }

@@ -4,6 +4,7 @@ import io.github.s0cks.mmc.Binary;
 import io.github.s0cks.mmc.Instruction;
 import io.github.s0cks.mmc.Operand;
 import io.github.s0cks.mmc.OperandAddress;
+import io.github.s0cks.mmc.OperandBytes;
 import io.github.s0cks.mmc.OperandInteger;
 import io.github.s0cks.mmc.OperandLabel;
 import io.github.s0cks.mmc.OperandRegister;
@@ -17,7 +18,8 @@ import java.util.Queue;
 
 public final class Parser{
   private final Queue<Token> tokens;
-  private final Map<String, Integer> labels = new HashMap<>();
+  private final Map<String, Short> labels = new HashMap<>();
+  private final Map<Integer, String> fixups = new HashMap<>();
 
   public Parser(InputStream in){
     this.tokens = ((LinkedList<Token>) Lexer.lex(in));
@@ -37,7 +39,7 @@ public final class Parser{
         case COMMENT: continue;
         case LABEL:{
           int addr = bin.counter();
-          this.labels.put(next.text, addr);
+          this.labels.put(next.text, (short) addr);
           label = next.text;
           continue;
         }
@@ -48,10 +50,10 @@ public final class Parser{
             break;
           }
 
-          operands[0] = this.nextOperand();
+          operands[0] = this.nextOperand(bin);
           if(this.tokens.peek() != null && this.tokens.peek().kind == Token.Kind.COMMA){
             this.tokens.remove();
-            operands[1] = this.nextOperand();
+            operands[1] = this.nextOperand(bin);
           }
           break;
         }
@@ -62,21 +64,30 @@ public final class Parser{
       statement.encode(bin);
     }
 
+    for(Map.Entry<Integer, String> fixup : this.fixups.entrySet()){
+      bin.setAt(fixup.getKey() + 1, this.labels.get(fixup.getValue()));
+    }
+
     return bin;
   }
 
-  private Operand<?> nextOperand(){
+  private Operand<?> nextOperand(Binary bin){
     Token next = this.tokens.remove();
     try{
       switch(next.kind){
+        case BYTES:{
+          return new OperandBytes(next.text);
+        }
         case NAME:{
           try{
             return new OperandRegister(Register.valueOf(next.text.toUpperCase()));
           } catch(Exception e) {
             // Not a Register
           }
+
           if(!this.labels.containsKey(next.text)){
-            throw new IllegalStateException("Unknown label: " + next.text);
+            this.fixups.put(bin.counter(), next.text);
+            return new OperandLabel(0);
           }
 
           return new OperandLabel(this.labels.get(next.text));
@@ -106,7 +117,7 @@ public final class Parser{
         }
       }
     } catch(Exception e){
-      throw new IllegalStateException("Lookahead: " + this.tokens.remove().text, e);
+      throw new IllegalStateException(e);
     }
   }
 }

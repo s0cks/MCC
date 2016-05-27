@@ -1,2 +1,5 @@
-twenty:
-    jmp twenty
+mov RDI, _print_h
+syscall 10
+
+_print_h:
+    db "Hello World"

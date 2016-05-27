@@ -12,6 +12,7 @@ public class DisassemblerTest {
   public void testDump()
   throws Exception {
     Binary bin = (new Parser(System.class.getResourceAsStream("/Test.mmc"))).compile();
+    System.out.println("Dumping");
     Disassembler.dump(new PrintWriter(System.out), bin);
   }
 }
