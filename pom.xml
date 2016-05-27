@@ -3,8 +3,8 @@
     <modelVersion>4.0.0</modelVersion>
 
     <groupId>io.github.s0cks</groupId>
-    <artifactId>mcm</artifactId>
-    <version>0.0.7.0</version>
+    <artifactId>mmc</artifactId>
+    <version>0.0.7.5</version>
 
     <build>
         <plugins>

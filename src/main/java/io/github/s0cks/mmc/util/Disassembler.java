@@ -18,10 +18,11 @@ public final class Disassembler {
 
       String str = "";
       for(int i = counter; i < counter + len - 1; i += 2){
-        str += ((char) (binary.get(i + 1) | (binary.get(i + 2) << 8)));
+        str += ((char) (binary.get(i) | (binary.get(i + 1) << 8)));
       }
       writer.write(str);
-      return len + 2;
+      System.out.println("<<<");
+      return len + 1;
     } else if (value < 0x10 + Register.values().length) {
       Register reg = Register.values()[value & 0x7];
       int offset = ((int) binary.get(counter));
@@ -33,12 +34,15 @@ public final class Disassembler {
              .toUpperCase()
       ));
     } else if(value == 0x2F){
+      System.out.println(">>>");
+
+      int label = (binary.get(counter) | (binary.get(counter + 1) << 8));
+      writer.write(Integer.toString(label));
+      return 2;
+    } else if(value == 0x1F){
+      System.out.println("...");
       writer.write(Integer.toString(binary.get(counter)));
-    } else if (value >= 0x20) {
-      writer.write(Integer.toString(value - 0x20));
-      return 0;
-    } else if (value == 0x1F) {
-      writer.write(Integer.toString(binary.get(counter)));
+      return 1;
     }
     return 1;
   }

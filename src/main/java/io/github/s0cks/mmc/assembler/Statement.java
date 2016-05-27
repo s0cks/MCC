@@ -44,7 +44,7 @@ public final class Statement {
     short op = 0;
 
     short extraBits[] = {
-      -1, -1
+      -1, -1, -1
     };
 
     switch (this.instruction) {
@@ -91,9 +91,6 @@ public final class Statement {
         }
         case LITERAL: {
           int value = ((OperandInteger) o).value();
-          if(value < 0x20){
-            return ((short) (value + 0x20));
-          }
           extra[index] = ((short) value);
           return 0x1F;
         }
@@ -103,7 +100,9 @@ public final class Statement {
           return (short) (0x10 | (addr.register.ordinal() & 7));
         }
         case LABEL:{
-          extra[index] = ((OperandLabel) o).value().shortValue();
+          OperandLabel label = ((OperandLabel) o);
+          extra[index] = ((short) (label.value() & 0xFF));
+          extra[index + 1] = ((short) ((label.value() >> 8) & 0xFF));
           return 0x2F;
         }
         case BYTES:{

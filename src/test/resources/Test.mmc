@@ -1,5 +1,8 @@
-mov RDI, _print_h
-syscall 10
+jmp _main
 
-_print_h:
+_hello_world_s:
     db "Hello World"
+
+_main:
+    mov RDI, _hello_world_s
+    syscall 15
