@@ -37,7 +37,6 @@ public final class Parser{
         case COMMENT: continue;
         case LABEL:{
           int addr = bin.counter();
-          System.out.println("Adding Label " + next.text + "@" + addr);
           this.labels.put(next.text, addr);
           label = next.text;
           continue;
@@ -80,7 +79,6 @@ public final class Parser{
             throw new IllegalStateException("Unknown label: " + next.text);
           }
 
-          System.out.println(next.text + "@" + this.labels.get(next.text));
           return new OperandLabel(this.labels.get(next.text));
         }
         case INT: return new OperandInteger(Integer.valueOf(next.text));
