@@ -4,7 +4,7 @@
 
     <groupId>io.github.s0cks</groupId>
     <artifactId>mmc</artifactId>
-    <version>0.0.7.5</version>
+    <version>0.0.8.0</version>
 
     <build>
         <plugins>

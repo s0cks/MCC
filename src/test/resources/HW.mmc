@@ -1,0 +1,8 @@
+_hello_world_s:
+    db "Hello World"
+
+_test_world_s:
+    db "Test World"
+
+_goodbye_world_s:
+    db "Goodbye World"

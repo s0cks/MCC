@@ -1,8 +1,7 @@
-jmp _main
-
-_hello_world_s:
-    db "Hello World"
-
 _main:
     mov RDI, _hello_world_s
+    syscall 15
+    mov RDI, _test_world_s
+    syscall 15
+    mov RDI, _goodbye_world_s
     syscall 15

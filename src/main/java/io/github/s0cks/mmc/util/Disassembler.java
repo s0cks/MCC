@@ -21,7 +21,6 @@ public final class Disassembler {
         str += ((char) (binary.get(i) | (binary.get(i + 1) << 8)));
       }
       writer.write(str);
-      System.out.println("<<<");
       return len + 1;
     } else if (value < 0x10 + Register.values().length) {
       Register reg = Register.values()[value & 0x7];
@@ -34,14 +33,11 @@ public final class Disassembler {
              .toUpperCase()
       ));
     } else if(value == 0x2F){
-      System.out.println(">>>");
-
       int label = (binary.get(counter) | (binary.get(counter + 1) << 8));
-      writer.write(Integer.toString(label));
+      writer.write("0x" + Integer.toString(label, 16).toUpperCase());
       return 2;
     } else if(value == 0x1F){
-      System.out.println("...");
-      writer.write(Integer.toString(binary.get(counter)));
+      writer.write("0x" + Integer.toString(binary.get(counter), 16).toUpperCase());
       return 1;
     }
     return 1;
@@ -70,7 +66,7 @@ public final class Disassembler {
           writer.write(" ");
           counter += disassembleOperand(writer, b, binary, counter + 1);
           writer.write("\n");
-        } else {
+        } else{
           instr = Instruction.values()[op];
 
           writer.write(instr.toString());
@@ -99,6 +95,7 @@ public final class Disassembler {
         writer.write(">\n");
       }
 
+      writer.flush();
       counter += 1;
     }
 

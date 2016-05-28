@@ -11,6 +11,7 @@ import io.github.s0cks.mmc.OperandRegister;
 import io.github.s0cks.mmc.Register;
 
 import java.io.InputStream;
+import java.io.OutputStream;
 import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.Map;
@@ -18,14 +19,18 @@ import java.util.Queue;
 
 public final class Parser{
   private final Queue<Token> tokens;
-  private final Map<String, Short> labels = new HashMap<>();
+  private final Map<String, Integer> labels = new HashMap<>();
   private final Map<Integer, String> fixups = new HashMap<>();
 
   public Parser(InputStream in){
     this.tokens = ((LinkedList<Token>) Lexer.lex(in));
   }
 
-  public Binary compile(){
+  public void defineSymbol(String label, int offset){
+    this.labels.put(label, offset);
+  }
+
+  public void compile(OutputStream out){
     Binary bin = new Binary();
 
     Instruction instr;
@@ -39,7 +44,7 @@ public final class Parser{
         case COMMENT: continue;
         case LABEL:{
           int addr = bin.counter();
-          this.labels.put(next.text, (short) addr);
+          this.labels.put(next.text, addr + 1);
           label = next.text;
           continue;
         }
@@ -65,10 +70,22 @@ public final class Parser{
     }
 
     for(Map.Entry<Integer, String> fixup : this.fixups.entrySet()){
-      bin.setAt(fixup.getKey() + 1, this.labels.get(fixup.getValue()));
+      bin.setAt(fixup.getKey() + 1, this.labels.get(fixup.getValue()).shortValue());
     }
 
-    return bin;
+    try{
+      out.write("symbols:\n".getBytes());
+      for(Map.Entry<String, Integer> lbl : this.labels.entrySet()){
+        out.write(String.format("%s 0x%04x\n", lbl.getKey(), lbl.getValue()).getBytes());
+      }
+      out.write("binary:\n".getBytes());
+      for(int i = 0; i < bin.counter(); i++){
+        out.write(String.format("0x%04x ", bin.get(i)).getBytes());
+      }
+      out.write("\nend".getBytes());
+    } catch(Exception e){
+      throw new RuntimeException(e);
+    }
   }
 
   private Operand<?> nextOperand(Binary bin){
@@ -90,7 +107,7 @@ public final class Parser{
             return new OperandLabel(0);
           }
 
-          return new OperandLabel(this.labels.get(next.text));
+          return new OperandLabel(this.labels.get(next.text) + 1);
         }
         case INT: return new OperandInteger(Integer.valueOf(next.text));
         case LBRACKET:{
